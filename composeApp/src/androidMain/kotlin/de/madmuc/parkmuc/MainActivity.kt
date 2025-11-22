@@ -12,6 +12,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+//        window.insetsController?.hide(android.view.WindowInsets.Type.systemBars())
+//        window.insetsController?.systemBarsBehavior =
+//            android.view.WindowInsetsController.BEHAVIOR_SHOW_BARS_BY_TOUCH
+
+
         setContent {
             App()
         }

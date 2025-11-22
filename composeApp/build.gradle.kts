@@ -61,6 +61,7 @@ kotlin {
             implementation("dev.jordond.compass:geolocation-mobile:${compassVersion}")
 // Optional - Location permissions for mobile (Android/iOS)
             implementation("dev.jordond.compass:permissions-mobile:${compassVersion}")
+            implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
