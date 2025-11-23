@@ -11,13 +11,24 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SettingsScreen(onNavigate: (Screen) -> Unit) {
+fun SettingsScreen(
+    onNavigate: (Screen) -> Unit,
+    viewModel: SettingsViewModel
+) {
+    var notificationsEnabled by remember {
+        mutableStateOf(viewModel.getSetting("notifications") as? Boolean ?: true)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -48,7 +59,12 @@ fun SettingsScreen(onNavigate: (Screen) -> Unit) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("Deine Einstellungen hier...")
+            Button(onClick = {
+                notificationsEnabled = !notificationsEnabled
+                viewModel.saveSetting("notifications", notificationsEnabled)
+            }) {
+                Text("Benachrichtigungen: ${if (notificationsEnabled) "An" else "Aus"}")
+            }
         }
     }
 }

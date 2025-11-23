@@ -33,7 +33,10 @@ data class ParkingFilters(
 )
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(onNavigate: (Screen) -> Unit) {
+fun MapScreen(
+    onNavigate: (Screen) -> Unit,
+    viewModel: SettingsViewModel
+) {
     var userLocation by remember { mutableStateOf<Pair<Double, Double>?>( Pair(48.1373, 11.5753)) }
     var centerd by remember {mutableStateOf<Boolean>(false)}
 
@@ -51,7 +54,7 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
 //        userLocation?.let { location ->
             try {
                 val response: HttpResponse = client.get(
-                    "http://131.159.203.21:8080/parking/segments?latitude=48.1373&longitude=11.5753&radius=500"
+                    "http://131.159.203.21:8080/parking/segments?latitude=48.1373&longitude=11.5753&radius=500"+("&disabledParking="+ (viewModel.getSetting("hasDisabilityPass") as? Boolean ?: true))
 //                    "http://131.159.203.21:8080/parking/segments?latitude=${location.second}&longitude=${location.first}&radius=500"
                 )
                 parkingData = response.bodyAsText()
@@ -135,7 +138,6 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
                         source = parkingDataGeoJson,
                         color = const(Color.Green),
                         width = const(4.dp),
-//                        filter = arrayOf("<", arrayOf("get", "capacity"), 3) as Expression<BooleanValue>,
                     )
                 }
             }

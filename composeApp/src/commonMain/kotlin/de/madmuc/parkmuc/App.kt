@@ -14,20 +14,26 @@ sealed class Screen {
 fun rememberNavigationState() = remember { mutableStateOf<Screen>(Screen.MapScreen) }
 
 @Composable
-fun NavigationHost(currentScreen: Screen, onNavigate: (Screen) -> Unit) {
+fun NavigationHost(
+    currentScreen: Screen,
+    onNavigate: (Screen) -> Unit,
+    settingsViewModel: SettingsViewModel
+) {
     when (currentScreen) {
-        is Screen.MapScreen -> MapScreen(onNavigate)
-        is Screen.SettingsScreen -> SettingsScreen(onNavigate)
-        is Screen.SpecialRightsScreen -> SpecialRightsScreen(onNavigate)
+        is Screen.MapScreen -> MapScreen(onNavigate, settingsViewModel)
+        is Screen.SettingsScreen -> SettingsScreen(onNavigate, settingsViewModel)
+        is Screen.SpecialRightsScreen -> SpecialRightsScreen(onNavigate, settingsViewModel)
     }
 }
 
 @Composable
 fun App() {
     val currentScreen = remember { mutableStateOf<Screen>(Screen.MapScreen) }
+    val settingsViewModel = remember { SettingsViewModel() }
 
     NavigationHost(
         currentScreen = currentScreen.value,
-        onNavigate = { screen -> currentScreen.value = screen }
+        onNavigate = { screen -> currentScreen.value = screen },
+        settingsViewModel = settingsViewModel
     )
 }

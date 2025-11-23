@@ -6,7 +6,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -15,12 +14,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
-    val isWoman = remember { mutableStateOf(false) }
-    val hasECar = remember { mutableStateOf(false) }
-    val hasDisabilityPass = remember { mutableStateOf(false) }
-    val hasResidentPass = remember { mutableStateOf(false) }
-    val residentPassLocation = remember { mutableStateOf("") }
+fun SpecialRightsScreen(
+    onNavigate: (Screen) -> Unit,
+    viewModel: SettingsViewModel
+) {
+    val isWoman = remember {
+        mutableStateOf(viewModel.getSetting("isWoman") as? Boolean ?: false)
+    }
+    val hasECar = remember {
+        mutableStateOf(viewModel.getSetting("hasECar") as? Boolean ?: false)
+    }
+    val hasDisabilityPass = remember {
+        mutableStateOf(viewModel.getSetting("hasDisabilityPass") as? Boolean ?: false)
+    }
+    val hasResidentPass = remember {
+        mutableStateOf(viewModel.getSetting("hasResidentPass") as? Boolean ?: false)
+    }
+    val residentPassLocation = remember {
+        mutableStateOf(viewModel.getSetting("residentPassLocation") as? String ?: "")
+    }
 
     Box(
         modifier = Modifier
@@ -60,7 +72,10 @@ fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
             ) {
                 Checkbox(
                     checked = isWoman.value,
-                    onCheckedChange = { isWoman.value = it }
+                    onCheckedChange = {
+                        isWoman.value = it
+                        viewModel.saveSetting("isWoman", it)
+                    }
                 )
                 Text(
                     "Ich bin eine Frau",
@@ -78,7 +93,10 @@ fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
             ) {
                 Checkbox(
                     checked = hasECar.value,
-                    onCheckedChange = { hasECar.value = it }
+                    onCheckedChange = {
+                        hasECar.value = it
+                        viewModel.saveSetting("hasECar", it)
+                    }
                 )
                 Text(
                     "Ich habe ein E-Auto",
@@ -96,7 +114,10 @@ fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
             ) {
                 Checkbox(
                     checked = hasDisabilityPass.value,
-                    onCheckedChange = { hasDisabilityPass.value = it }
+                    onCheckedChange = {
+                        hasDisabilityPass.value = it
+                        viewModel.saveSetting("hasDisabilityPass", it)
+                    }
                 )
                 Text(
                     "Ich habe einen Behindertenausweis",
@@ -114,7 +135,10 @@ fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
             ) {
                 Checkbox(
                     checked = hasResidentPass.value,
-                    onCheckedChange = { hasResidentPass.value = it }
+                    onCheckedChange = {
+                        hasResidentPass.value = it
+                        viewModel.saveSetting("hasResidentPass", it)
+                    }
                 )
                 Text(
                     "Ich habe einen Anwohnerausweis",
@@ -135,7 +159,10 @@ fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = residentPassLocation.value,
-                    onValueChange = { residentPassLocation.value = it },
+                    onValueChange = {
+                        residentPassLocation.value = it
+                        viewModel.saveSetting("residentPassLocation", it)
+                    },
                     placeholder = { Text("z.B. Parkhaus ABC, Bereich 3") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -146,7 +173,8 @@ fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
 
             Button(
                 onClick = {
-
+                    // Data is already saved on each change, just navigate back
+                    onNavigate(Screen.MapScreen)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -160,4 +188,3 @@ fun SpecialRightsScreen(onNavigate: (Screen) -> Unit) {
         }
     }
 }
-//TODO persistent Storage
