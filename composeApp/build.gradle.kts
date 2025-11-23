@@ -39,6 +39,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation("io.ktor:ktor-client-android:2.3.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -60,7 +62,11 @@ kotlin {
             implementation("dev.jordond.compass:permissions-mobile:${compassVersion}")
             implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
 
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+//            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+            implementation("io.ktor:ktor-client-core:2.3.0")
+            implementation("io.ktor:ktor-client-logging:2.3.0")
+            implementation("io.ktor:ktor-client-logging:2.3.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

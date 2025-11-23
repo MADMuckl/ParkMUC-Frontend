@@ -12,16 +12,19 @@ import dev.jordond.compass.geolocation.Geolocator
 import dev.jordond.compass.geolocation.GeolocatorResult
 import dev.jordond.compass.geolocation.TrackingStatus
 import dev.jordond.compass.geolocation.mobile
+import io.ktor.client.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.layers.LineLayer
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.spatialk.geojson.Position
-import kotlin.time.Duration.Companion.seconds
 
 data class ParkingFilters(
     val isFree: Boolean = false,
@@ -38,6 +41,25 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
     var showFilter by remember { mutableStateOf(false) }
     var filters by remember { mutableStateOf(ParkingFilters()) }
+    var parkingData by remember { mutableStateOf<String>("") }
+    var error by remember { mutableStateOf<String?>("") }
+    val client = remember { HttpClient() }
+
+
+    LaunchedEffect(Unit) {
+//    LaunchedEffect(userLocation) {
+//        userLocation?.let { location ->
+            try {
+                val response: HttpResponse = client.get(
+                    "http://131.159.203.21:8080/parking/segments?latitude=48.1373&longitude=11.5753&radius=500"
+//                    "http://131.159.203.21:8080/parking/segments?latitude=${location.second}&longitude=${location.first}&radius=500"
+                )
+                parkingData = response.bodyAsText()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                error = e.message
+            }
+    }
 
     LaunchedEffect(geolocator) {
         geolocator.startTracking()
@@ -47,11 +69,9 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
                 is TrackingStatus.Update -> {
                     val coordinates = status.location.coordinates
                     userLocation = Pair(coordinates.latitude, coordinates.longitude)
-                    println("Location updated: ${coordinates.latitude}, ${coordinates.longitude}")
                 }
                 is TrackingStatus.Error -> {
                     val error: GeolocatorResult.Error = status.cause
-                    println("Geolocation error: $error")
                 }
                 else -> {}
             }
@@ -104,6 +124,20 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
                     color = const(Color(0xFFFFE222)),
                     radius = const(10.dp)
                 )
+
+                if (parkingData.isNotEmpty()) {
+                    val parkingDataGeoJson = rememberGeoJsonSource(
+                        GeoJsonData.JsonString(parkingData)
+                    )
+
+                    LineLayer(
+                        id = "lines",
+                        source = parkingDataGeoJson,
+                        color = const(Color.Green),
+                        width = const(4.dp),
+//                        filter = arrayOf("<", arrayOf("get", "capacity"), 3) as Expression<BooleanValue>,
+                    )
+                }
             }
 
 
@@ -116,7 +150,9 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
                     containerColor = Color(0xFF1b98d5)
                 )
             ) {
-                Text("☰", style = MaterialTheme.typography.headlineSmall, color = Color.White)
+                Text(
+                    "☰"
+                    , style = MaterialTheme.typography.headlineSmall, color = Color.White)
             }
 
             if (showMenu) {
@@ -166,6 +202,8 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
                         ) {
                             Text("Sonderpark Rechte", color = Color.White)
                         }
+//                        Text("__error:"+error, color = Color.White)
+//                        Text("__debug:"+parkingData, color = Color.White)
                     }
                 }
             }
@@ -292,18 +330,20 @@ fun MapScreen(onNavigate: (Screen) -> Unit) {
                 }
             }
 
-            if (centerd) {
-                centerd = !centerd
-                userLocation?.let {
-                    LaunchedEffect(Unit) {
-                        cameraState.animateTo(
-                            finalPosition = cameraState.position.copy(
+            LaunchedEffect(centerd, userLocation) {
+                try {
+                    if (centerd && userLocation != null) {
+                        userLocation?.let {
+                            cameraState.position = cameraState.position.copy(
                                 target = Position(latitude = it.first, longitude = it.second),
                                 zoom = 14.0
-                            ),
-                            duration = 3.seconds,
-                        )
+                            )
+                        }
+                        centerd = false
                     }
+                } catch (e: Exception) {
+                    println("Camera error: ${e.message}")
+                    centerd = false
                 }
             }
         }
