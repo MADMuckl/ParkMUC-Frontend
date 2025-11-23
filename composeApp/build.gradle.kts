@@ -12,6 +12,7 @@ kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.add("-Xexpect-actual-classes")
         }
     }
 
@@ -54,14 +55,12 @@ kotlin {
             val compassVersion = "1.0.0"
             implementation("dev.jordond.compass:geocoder:${compassVersion}")
             implementation("dev.jordond.compass:geocoder-mobile:${compassVersion}")
-// Geolocation
             implementation("dev.jordond.compass:geolocation:${compassVersion}")
-// To use geolocation you need to use one or more of the following
-// Optional - Geolocation support for only iOS and Android
             implementation("dev.jordond.compass:geolocation-mobile:${compassVersion}")
-// Optional - Location permissions for mobile (Android/iOS)
             implementation("dev.jordond.compass:permissions-mobile:${compassVersion}")
             implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
